@@ -11,7 +11,7 @@ class User(db.Model):
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(10), nullable=False)
     profile_image_url = db.Column(db.String(50), nullable=False, default='default.jpg')
-    device_registration_key = db.Column(db.String(100))
+    device_registration_key = db.Column(db.String(25))
     thumbnail_url = db.Column(db.String(50), default='default.jpg')
     last_online = db.Column(db.DateTime)
     created_date = db.Column(db.DateTime, default=datetime.now())
