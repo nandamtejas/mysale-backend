@@ -114,6 +114,8 @@ class Category(db.Model):
         try:
             categories = Category.query.order_by(Category.id).all()
             output = []
+            if not categories:
+                return {'message': "Categories not found"}, 404
             for category in categories:
                 output.append({
                     'id': category.id,
@@ -136,7 +138,7 @@ class Category(db.Model):
         try:
             category = Category.query.get(category_id)
             if not category:
-                raise BadRequest('Category Not Found', response=404)
+                return {'message': f"Category with id {category_id} not found"}, 404
             return {
                     'id': category.id,
                     'name': category.name,

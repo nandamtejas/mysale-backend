@@ -37,8 +37,9 @@ class LogIn(Resource):
             if body is None:
                 raise BadRequest('No data is requested', response=404)
             user = User.query.filter_by(email=body['email']).first()
+            email = body['email']
             if not user:
-                raise BadRequest(f'User with email {body.get(email)} not exists')
+                raise BadRequest('User with email {} not exists'.format(email))
             authorized = check_password_hash(user.password, password=body['password'])
             if not authorized:
                 raise BadRequest('Incorrect Password')

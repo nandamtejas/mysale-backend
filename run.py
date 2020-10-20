@@ -10,6 +10,7 @@ ns_auth.add_resource(ResetPassword, '/reset/<token>')
 ns_users.add_resource(GetUsers, '/all_users')
 ns_users.add_resource(UpdateUsers, '/user/<int:id>')
 ns_category.add_resource(CatagoriesCreate, '/')
+ns_category.add_resource(UpdateCategory, '/<int:id>')
 
 if __name__ == '__main__':
     app.run(debug=True)
