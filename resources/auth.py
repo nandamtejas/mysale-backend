@@ -16,10 +16,10 @@ class SignUp(Resource):
             if user:
                 raise BadRequest(f'User with email {email} already exists')
             user = User(first_name=body['first_name'], last_name=body['last_name'], email=body['email'], role=body['role'])
-            db.session.add(user)
             password = generate_password_hash(password=body['password'])
             user.password = password
             user.created_date = datetime.now()
+            db.session.add(user)
             db.session.commit()
             return {'message': 'success'}, 200
         except InternalServerError as e:
