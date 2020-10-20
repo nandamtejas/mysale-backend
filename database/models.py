@@ -130,6 +130,8 @@ class Category(db.Model):
                     'deleted_date': str(category.deleted_date)
                 })
             return output
+        except NoResultFound:
+            raise BadRequest('Categories Not found')
         except InternalServerError as e:
             raise BadRequest(e, response=400)
     
