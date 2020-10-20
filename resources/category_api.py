@@ -12,11 +12,16 @@ class CatagoriesCreate(Resource):
             user = User.query.get(user_id)
             if not user:
                 raise UserNotExistsError
-            return Category.get_all_categories_to_json()
+            c = Category.get_all_categories_to_json()
+            if not c:
+                raise NoResultFound
+            return c
         except InternalServerError as e:
-            raise BadRequest(errors['InternalServerError']['message'], response=400)
+            raise BadRequest(errors['InternalServerError']['message']), 400
         except UserNotExistsError:
             raise BadRequest(f"User with id {user_id} not exist")
+        except NoResultFound:
+            raise BadRequest('Categories Not found'), 404
     
     @jwt_required
     @ns_category.expect(category)
