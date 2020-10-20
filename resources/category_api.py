@@ -14,14 +14,12 @@ class CatagoriesCreate(Resource):
                 raise UserNotExistsError
             c = Category.get_all_categories_to_json()
             if not c:
-                raise NoResultFound
+                return {'message': 'Categories Not Found'}, 404
             return c
         except InternalServerError as e:
-            raise BadRequest(errors['InternalServerError']['message']), 400
+            raise BadRequest(errors['InternalServerError']['message'])
         except UserNotExistsError:
             raise BadRequest(f"User with id {user_id} not exist")
-        except NoResultFound:
-            raise BadRequest('Categories Not found'), 404
     
     @jwt_required
     @ns_category.expect(category)
@@ -37,7 +35,7 @@ class CatagoriesCreate(Resource):
             if not user:
                 raise UserNotExistsError
             if user.role != 'admin':
-                raise BadRequest('No access to create the category', response=400)
+                return {'message': "No rights to create the category"}, 400
             body = request.get_json()
             category = Category(name=body['name'], image_url=body['image_url'],description=body['description'],order=body['order'])
             db.session.add(category)
