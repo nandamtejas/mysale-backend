@@ -113,8 +113,6 @@ class Category(db.Model):
     def get_all_categories_to_json():
         try:
             categories = Category.query.order_by(Category.id).all()
-            if not categories:
-                raise NoResultFound
             output = []
             for category in categories:
                 output.append({
@@ -130,8 +128,6 @@ class Category(db.Model):
                     'deleted_date': str(category.deleted_date)
                 })
             return output
-        except NoResultFound:
-            raise BadRequest('Categories Not found')
         except InternalServerError as e:
             raise BadRequest(e, response=400)
     
