@@ -5,7 +5,7 @@ load_dotenv()
 
 # SQLALCHEMY SETTINGS
 #SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL'] = 'sqlite:///database.db'
-SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL'] = 'postgres://pojakjrqacycsi:cc351aa770a422b7a5c621ea74ed9bbb6863072cc53b0ffd8d4a1657e2d72959@ec2-52-200-82-50.compute-1.amazonaws.com:5432/d3p9vhfiojd6i6'
+SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL'] = 'postgres://bkcfpruwbzsgrv:8c0adddc6bb881ced19d3661fa0659471990b14b2cd98a38e281d312ca940cae@ec2-52-21-247-176.compute-1.amazonaws.com:5432/d7hs5q051etd4r'
 SQLALCHEMY_TRACK_MODIFICATIONS=True
 SECRET_KEY=os.environ['SECRET_KEY']
 
