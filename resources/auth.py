@@ -16,7 +16,7 @@ class SignUp(Resource):
             if user:
                 raise BadRequest(f'User with email {email} already exists')
             user = User(first_name=body['first_name'], last_name=body['last_name'], email=body['email'], role=body['role'])
-            password = generate_password_hash(password=body['password'])
+            password = generate_password_hash(password=body['password']).decode('UTF-8')
             user.password = password
             user.created_date = datetime.now()
             db.session.add(user)
