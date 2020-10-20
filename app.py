@@ -93,7 +93,7 @@ category = api.model('CATEGORY', {
 })
  
 vendor = api.model('VENDOR', {
-    'name': fields.String(required=True, example='category_name'),
+    'name': fields.String(required=True, example='vendor_name'),
     'image_url': fields.String(example='default.jpg'),
     'description': fields.String(required=True),
     'order': fields.String(required=True)

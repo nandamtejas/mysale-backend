@@ -170,6 +170,51 @@ class Vendor(db.Model):
     deals = db.relationship('Deals', backref='vendor_deals')
     user_preference = db.relationship("UserVendorPreference", backref='user_preference')
 
+    @staticmethod
+    def get_all_vendors_to_json():
+        try:
+            vendors = Vendor.query.order_by(Vendor.id).all()
+            if not vendors:
+                raise BadRequest('Vendors not found!', response=404)
+            output = []
+            for vendor in vendors:
+                return {
+                    'id': vendor.id,
+                    'name': vendor.name,
+                    'image_url': vendor.image_url,
+                    'description': vendor.description,
+                    'order': vendor.order,
+                    'added_by': vendor.added_by,
+                    'created_date': str(vendor.created_date),
+                    'updated_date': str(vendor.updated_date),
+                    'is_deleted': vendor.is_deleted,
+                    'deleted_date': str(vendor.deleted_date)
+                }, 200
+        except InternalServerError as e:
+            return {'message': e}, 400
+    
+    @staticmethod
+    def get_vendor_to_json(vendor_id):
+        try:
+            vendor = Vendor.query.get(vendor_id)
+            if not vendor:
+                return {'message': 'Vendor not found!'}, 404
+            return {
+                    'id': vendor.id,
+                    'name': vendor.name,
+                    'image_url': vendor.image_url,
+                    'description': vendor.description,
+                    'order': vendor.order,
+                    'added_by': vendor.added_by,
+                    'created_date': str(vendor.created_date),
+                    'updated_date': str(vendor.updated_date),
+                    'is_deleted': vendor.is_deleted,
+                    'deleted_date': str(vendor.deleted_date)
+                }, 200
+        except InternalServerError as e:
+            return {'message': e}, 400
+
+
 class VendorCategoryMapping(db.Model):
     __tabelname__ = 'vendor_category_mapping'
     id = db.Column(db.Integer, primary_key=True)
