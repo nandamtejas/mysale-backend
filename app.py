@@ -47,6 +47,7 @@ mail = Mail(app)
 
 bcrypt = Bcrypt(app=app)
 jwt = JWTManager(app=app)
+jwt._set_error_handler_callbacks(api)
 db = SQLAlchemy(app=app)
 
 #namespace
@@ -107,6 +108,3 @@ deals = api.model("DEALS", {
     'end_date': fields.Date(required=True)
 })
 
-if __name__ == '__main__':
-    app.run(debug=True)
-    
