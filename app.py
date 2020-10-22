@@ -54,6 +54,7 @@ ns_auth = api.namespace('auth', description='authorization')
 ns_users = api.namespace('users', description='users')
 ns_category = api.namespace('category', description='Categories')
 ns_vendor = api.namespace('vendor', description='Vendors')
+ns_deals = api.namespace('deals', description='deals')
 
 # fields
 register = api.model('REGISTER', {
@@ -99,6 +100,12 @@ vendor = api.model('VENDOR', {
     'order': fields.String(required=True)
 })
 
+deals = api.model("DEALS", {
+    'name': fields.String(required=True, example='deal_name'),
+    'image_url': fields.String(example='default.jpg'),
+    'start_date': fields.Date(required=True),
+    'end_date': fields.Date(required=True)
+})
 
 if __name__ == '__main__':
     app.run(debug=True)

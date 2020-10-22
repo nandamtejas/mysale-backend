@@ -17,6 +17,8 @@ class CatagoriesCreate(Resource):
             raise BadRequest(errors['InternalServerError']['message'])
         except UserNotExistsError:
             raise BadRequest(f"User with id {user_id} not exist")
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
     
     @jwt_required
     @ns_category.expect(category)
@@ -43,6 +45,8 @@ class CatagoriesCreate(Resource):
             raise BadRequest(f"User with id {user_id} not exists", response=404)
         except InternalServerError as e:
             raise BadRequest(e, response=400)
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
 
 class UpdateCategory(Resource):
 
@@ -62,6 +66,8 @@ class UpdateCategory(Resource):
             return {'message': e}, 400
         except UserNotExistsError:
             raise BadRequest(f"User with id {user_id} not exist", response=404)
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
     
     @jwt_required
     def delete(self, id):
@@ -87,6 +93,8 @@ class UpdateCategory(Resource):
             raise BadRequest(f"User with id {user_id} not exists")
         except InternalServerError as e:
             return {'message': e}, 400
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
     
     @jwt_required
     @ns_category.expect(category)
@@ -123,4 +131,6 @@ class UpdateCategory(Resource):
             raise BadRequest(f"User with id {user_id} not exists")
         except InternalServerError as e:
             return {'message': e}, 400
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
     

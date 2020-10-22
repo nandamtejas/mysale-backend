@@ -17,6 +17,8 @@ class GetUsers(Resource):
             raise BadRequest(e, response=400)
         except UserNotExistsError:
             raise BadRequest(errors['UserNotExistsError']['message'], response=404)
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
 
 class UpdateUsers(Resource):
 
@@ -39,6 +41,8 @@ class UpdateUsers(Resource):
             raise BadRequest(errors['UserNotExistsError']['message'], response=404)
         except InternalServerError as e:
             raise BadRequest(e, response=400)
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
 
     @jwt_required
     @ns_users.expect(update_user)
@@ -78,6 +82,8 @@ class UpdateUsers(Resource):
             raise BadRequest(errors['UserAlreadyExistsError']['message'], response=402)
         except InternalServerError as e:
             raise BadRequest(e, response=400)
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
     
     @jwt_required
     def delete(self, id):
@@ -105,5 +111,7 @@ class UpdateUsers(Resource):
             raise BadRequest(errors['UserNotExistsError']['message'], response=404)
         except InternalServerError as e:
             raise BadRequest(e, response=400)
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
 
 

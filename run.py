@@ -3,6 +3,7 @@ from resources.auth import *
 from resources.users_api import *
 from resources.category_api import *
 from resources.vendor_api import *
+from resources.deals_api import *
 
 ns_auth.add_resource(SignUp, '/register')
 ns_auth.add_resource(LogIn, '/login')
@@ -14,6 +15,7 @@ ns_category.add_resource(CatagoriesCreate, '/')
 ns_category.add_resource(UpdateCategory, '/<int:id>')
 ns_vendor.add_resource(VendorCreate, '/')
 ns_vendor.add_resource(UpdateVendor, '/<int:id>')
+ns_deals.add_resource(CreateDeals, '/<int:vendor_id>')
 
 if __name__ == '__main__':
     app.run(debug=True)

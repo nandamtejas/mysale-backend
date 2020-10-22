@@ -17,6 +17,8 @@ class VendorCreate(Resource):
             raise BadRequest('User with id {} not found'.format(user_id),response=404)
         except InternalServerError as e:
             return {'message': e}, 400
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
     
     @jwt_required
     @ns_vendor.expect(vendor)
@@ -46,6 +48,8 @@ class VendorCreate(Resource):
             raise BadRequest('User with id {} not exists'.format(user_id))
         except InternalServerError as e:
             return {'message': e}, 400
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
 
 
 class UpdateVendor(Resource):
@@ -66,6 +70,8 @@ class UpdateVendor(Resource):
             raise BadRequest(f"User with id {user_id} not exists", response=404)
         except InternalServerError as e:
             return {'message': e}, 400
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
     
     @jwt_required
     def delete(self,id):
@@ -91,6 +97,8 @@ class UpdateVendor(Resource):
             raise BadRequest(f"User with id{user_id} not exists")
         except InternalServerError as e:
             return {'message': e}, 400
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
     
     @jwt_required
     @ns_vendor.expect(vendor)
@@ -125,3 +133,5 @@ class UpdateVendor(Resource):
             raise BadRequest(f"User with id {user_id} not exists", response=404)
         except InternalServerError as e:
             return {'message': e}, 400
+        except NoAuthorizationError:
+            return {'message': 'Authorization header missing'}, 401
