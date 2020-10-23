@@ -61,8 +61,7 @@ register = api.model('REGISTER', {
     'first_name': fields.String(required=True, example='first_name'),
     'last_name': fields.String(required=True, example='last_name'),
     'email': fields.String(required=True, example='email@domain.com'),
-    'password': fields.String(required=True, example='password'),
-    'role': fields.String(required=True, example='admin/user')
+    'password': fields.String(required=True, example='password')
 })
 
 login = api.model('LOGIN', {
@@ -103,10 +102,15 @@ vendor = api.model('VENDOR', {
 deals = api.model("DEALS", {
     'name': fields.String(required=True, example='deal_name'),
     'image_url': fields.String(example='default.jpg'),
-    'start_date': fields.Date(required=True),
-    'end_date': fields.Date(required=True)
+    'start_date': fields.String(required=True, example='DD-MM-YYYY HH:mm AM'),
+    'end_date': fields.String(required=True, example='DD-MM-YYYY HH:mm AM')
 })
 
 @api.errorhandler(NoAuthorizationError)
 def handle_error_auth(error):
     return {'message': 'No Authorization Header'}, 401
+
+@api.errorhandler(InternalServerError)
+def handle_error_internal_server(error):
+    e = errors['InternalServerError']
+    return {'message': str(e)}, 400

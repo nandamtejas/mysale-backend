@@ -9,7 +9,7 @@ class User(db.Model):
     last_name = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(10), nullable=False)
+    role = db.Column(db.String(10), nullable=False, default='user')
     profile_image_url = db.Column(db.String(50), nullable=False, default='default.jpg')
     device_registration_key = db.Column(db.String(25))
     thumbnail_url = db.Column(db.String(50), default='default.jpg')
@@ -179,7 +179,7 @@ class Vendor(db.Model):
                 raise BadRequest('Vendors not found!', response=404)
             output = []
             for vendor in vendors:
-                return {
+                output.append({
                     'id': vendor.id,
                     'name': vendor.name,
                     'image_url': vendor.image_url,
@@ -190,7 +190,8 @@ class Vendor(db.Model):
                     'updated_date': str(vendor.updated_date),
                     'is_deleted': vendor.is_deleted,
                     'deleted_date': str(vendor.deleted_date)
-                }, 200
+                })
+            return output
         except InternalServerError as e:
             return {'message': e}, 400
     
@@ -213,7 +214,7 @@ class Vendor(db.Model):
                     'deleted_date': str(vendor.deleted_date)
                 }, 200
         except InternalServerError as e:
-            return {'message': e}, 400
+            return {'message': str(e)}, 400
 
 
 class VendorCategoryMapping(db.Model):
@@ -241,6 +242,51 @@ class Deals(db.Model):
     deleted_date = db.Column(db.DateTime)
     deal_tags = db.relationship('DealTagMapping', backref='deal_tags')
     user_preference = db.relationship("UserDealPreference", backref='user_preference')
+
+    @staticmethod
+    def get_all_deals_to_json():
+        try:
+            deals = Deals.query.order_by(Deals.id).all()
+            output = []
+            for deal in deals:
+                output.append({
+                    'id': deal.id,
+                    'name': deal.name,
+                    'image_url': deal.image_url,
+                    'vendor_id': deal.vendor_id,
+                    'start_date': str(deal.start_date),
+                    'end_date': str(deal.end_date),
+                    'added_by': deal.added_by,
+                    'created_date': str(deal.created_date),
+                    'updated_date': str(deal.updated_date),
+                    'is_deleted': str(deal.is_deleted),
+                    'deleted_date': str(deal.deleted_date)
+                })
+            return output
+        except InternalServerError:
+            return {'message': str(e)}, 400
+    
+    @staticmethod
+    def get_deal_to_json(deal_id):
+        try:
+            deal = Deals.query.get(deal_id)
+            if not deal:
+                return {'message': 'Deal not found'}, 404
+            return {
+                'id': deal.id,
+                'name': deal.name,
+                'image_url': deal.image_url,
+                'vendor_id': deal.vendor_id,
+                'start_date': str(deal.start_date),
+                'end_date': str(deal.end_date),
+                'added_by': deal.added_by,
+                'created_date': str(deal.created_date),
+                'updated_date': str(deal.updated_date),
+                'is_deleted': str(deal.is_deleted),
+                'deleted_date': str(deal.deleted_date)
+            }, 200
+        except InternalServerError as e:
+            return {'message': str(e)}, 400
 
 class DealTag(db.Model):
     __tablename__ = 'deal_tag'

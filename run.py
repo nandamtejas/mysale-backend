@@ -16,6 +16,9 @@ ns_category.add_resource(UpdateCategory, '/<int:id>')
 ns_vendor.add_resource(VendorCreate, '/')
 ns_vendor.add_resource(UpdateVendor, '/<int:id>')
 ns_deals.add_resource(CreateDeals, '/<int:vendor_id>')
+ns_deals.add_resource(GetDeals, '/')
+ns_deals.add_resource(UpdateDeals, '/<int:id>')
+ns_deals.add_resource(GetDealsinDate, '/deals_ahead/<int:days_ahead>')
 
 if __name__ == '__main__':
     app.run(debug=True)
