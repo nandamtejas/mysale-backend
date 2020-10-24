@@ -106,11 +106,62 @@ deals = api.model("DEALS", {
     'end_date': fields.String(required=True, example='DD-MM-YYYY HH:mm AM')
 })
 
-@api.errorhandler(NoAuthorizationError)
-def handle_error_auth(error):
-    return {'message': 'No Authorization Header'}, 401
+# error handlers for jwt
 
-@api.errorhandler(InternalServerError)
-def handle_error_internal_server(error):
-    e = errors['InternalServerError']
-    return {'message': str(e)}, 400
+@api.errorhandler(NoAuthorizationError)
+def handle_auth_error(e):
+    return {'message': str(e)}, 401
+
+
+@api.errorhandler(CSRFError)
+def handle_auth_error(e):
+    return {'message': str(e)}, 401
+
+
+@api.errorhandler(ExpiredSignatureError)
+def handle_expired_error(e):
+    return {'message': 'Token has expired'}, 401
+
+
+@api.errorhandler(InvalidHeaderError)
+def handle_invalid_header_error(e):
+    return {'message': str(e)}, 422
+
+
+@api.errorhandler(InvalidTokenError)
+def handle_invalid_token_error(e):
+    return {'message': str(e)}, 422
+
+
+@api.errorhandler(JWTDecodeError)
+def handle_jwt_decode_error(e):
+    return {'message': str(e)}, 422
+
+
+@api.errorhandler(WrongTokenError)
+def handle_wrong_token_error(e):
+    return {'message': str(e)}, 422
+
+
+@api.errorhandler(RevokedTokenError)
+def handle_revoked_token_error(e):
+    return {'message': 'Token has been revoked'}, 401
+
+
+@api.errorhandler(FreshTokenRequired)
+def handle_fresh_token_required(e):
+    return {'message': 'Fresh token required'}, 401
+
+
+@api.errorhandler(UserLoadError)
+def handler_user_load_error(e):
+    # The identity is already saved before this exception was raised,
+    # otherwise a different exception would be raised, which is why we
+    # can safely call get_jwt_identity() here
+    identity = get_jwt_identity()
+    return {'message': "Error loading the user {}".format(identity)}, 401
+
+
+@api.errorhandler(UserClaimsVerificationError)
+def handle_failed_user_claims_verification(e):
+    return {'message': 'User claims verification failed'}, 400
