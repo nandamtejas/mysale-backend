@@ -3,7 +3,7 @@ from flask_restx import Api, abort, fields, Resource
 from flask_jwt_extended import JWTManager, jwt_required, decode_token, create_access_token, get_jwt_identity
 from flask_bcrypt import generate_password_hash, check_password_hash, Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from jwt.exceptions import DecodeError
+from jwt.exceptions import *
 from flask_jwt_extended.exceptions import *
 from werkzeug.exceptions import BadRequest
 import datetime as dt
