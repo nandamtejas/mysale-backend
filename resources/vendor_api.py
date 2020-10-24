@@ -40,6 +40,7 @@ class VendorCreate(Resource):
             vendor = Vendor(name=body['name'], image_url=body['image_url'], description=body['description'], order=body['order'])
             db.session.add(vendor)
             vendor.added_by = user_id
+            vendor.created_date = datetime.now()
             db.session.commit()
             return {'message': 'Success'}, 200
         except SchemaValidationError:

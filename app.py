@@ -101,9 +101,45 @@ vendor = api.model('VENDOR', {
 
 deals = api.model("DEALS", {
     'name': fields.String(required=True, example='deal_name'),
+    'vendor_id': fields.Integer(requierd=True, example=1),
     'image_url': fields.String(example='default.jpg'),
     'start_date': fields.String(required=True, example='DD-MM-YYYY HH:mm AM'),
     'end_date': fields.String(required=True, example='DD-MM-YYYY HH:mm AM')
+})
+
+deal_tags = api.model("DEAL_TAGS", {
+    'name': fields.String(required=True, example='deal_tag_name'),
+    'category_id': fields.Integer(required=True, example=1)
+})
+
+user_cat = api.model("USER_CATEGORY", {
+    'user_id': fields.Integer(required=True, example=1),
+    'category_id': fields.Integer(required=True, example=1),
+    'is_deleted': fields.Boolean(required=True, example=False)
+})
+
+user_ven = api.model("USER_VENDOR", {
+    'user_id': fields.Integer(required=True, example=1),
+    'vendor_id': fields.Integer(required=True, example=1),
+    'is_deleted': fields.Boolean(required=True, example=False)
+})
+
+user_deal = api.model("USER_DEAL", {
+    'user_id': fields.Integer(required=True, example=1),
+    'deal_id': fields.Integer(required=True, example=1),
+    'is_deleted': fields.Boolean(required=True, example=False)
+})
+
+user_category_preferences = api.model("USER_CATEGORY_PREFERENCES",{
+    'user_category_preferences': fields.List(fields.Nested(user_cat, skip_none=True))
+})
+
+user_vendor_preference = api.model("USER_VENDOR_PREFERENCES", {
+    'user_vendor_preference': fields.List(fields.Nested(user_ven, skip_none=True))
+})
+
+user_deal_preference = api.model("USER_DEAL_PREFERENCES", {
+    'user_deal_preference': fields.List(fields.Nested(user_deal, skip_none=True))
 })
 
 # error handlers for jwt

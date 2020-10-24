@@ -39,6 +39,7 @@ class CatagoriesCreate(Resource):
             category = Category(name=body['name'], image_url=body['image_url'],description=body['description'],order=body['order'])
             db.session.add(category)
             category.added_by = user_id
+            category.created_date = datetime.now()
             db.session.commit()
             return {'message': 'success'}, 200
         except UserNotExistsError:

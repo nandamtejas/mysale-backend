@@ -47,7 +47,7 @@ class User(db.Model):
                     'deleted_date': str(user.deleted_date)
                 }
                 output.append(user_data)
-            return output
+            return {'users': output}, 200
         except NoResultFound:
             raise BadRequest('Data Not found', response=404)
         except Exception as e:
@@ -130,7 +130,7 @@ class Category(db.Model):
                     'is_deleted': category.is_deleted,
                     'deleted_date': str(category.deleted_date)
                 })
-            return output
+            return {'categories': output}, 200
         except InternalServerError as e:
             raise BadRequest(e, response=400)
     
@@ -191,7 +191,7 @@ class Vendor(db.Model):
                     'is_deleted': vendor.is_deleted,
                     'deleted_date': str(vendor.deleted_date)
                 })
-            return output
+            return {'vendors': output}, 200
         except InternalServerError as e:
             return {'message': e}, 400
     
@@ -262,7 +262,7 @@ class Deals(db.Model):
                     'is_deleted': str(deal.is_deleted),
                     'deleted_date': str(deal.deleted_date)
                 })
-            return output
+            return {'deals': output}, 200
         except InternalServerError:
             return {'message': str(e)}, 400
     
@@ -291,6 +291,7 @@ class Deals(db.Model):
 class DealTag(db.Model):
     __tablename__ = 'deal_tag'
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(35))
     category_id = db.Column(db.Integer, db.ForeignKey('category_table.id'), nullable=False)
     created_date = db.Column(db.DateTime, default=datetime.now())
     updated_date = db.Column(db.DateTime)
