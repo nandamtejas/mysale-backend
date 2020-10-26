@@ -61,6 +61,9 @@ ns_users = api.namespace('users', description='users')
 ns_category = api.namespace('category', description='Categories')
 ns_vendor = api.namespace('vendor', description='Vendors')
 ns_deals = api.namespace('deals', description='deals')
+ns_user_cat_map = api.namespace('user_categories', description='User_Categories')
+ns_user_vend_map = api.namespace('user_vendors', description='User-Vendors')
+ns_user_deals_map = api.namespace('user_deals', description='User-Deals')
 
 # fields
 register = api.model('REGISTER', {
@@ -119,20 +122,17 @@ deal_tags = api.model("DEAL_TAGS", {
 })
 
 user_cat = api.model("USER_CATEGORY", {
-    'user_id': fields.Integer(required=True, example=1),
-    'category_id': fields.Integer(required=True, example=1),
+    'category_id': fields.Integer(required=True, example=1, description='category id'),
     'is_deleted': fields.Boolean(required=True, example=False)
 })
 
 user_ven = api.model("USER_VENDOR", {
-    'user_id': fields.Integer(required=True, example=1),
-    'vendor_id': fields.Integer(required=True, example=1),
+    'vendor_id': fields.Integer(required=True, example=1, description='vendor id'),
     'is_deleted': fields.Boolean(required=True, example=False)
 })
 
 user_deal = api.model("USER_DEAL", {
-    'user_id': fields.Integer(required=True, example=1),
-    'deal_id': fields.Integer(required=True, example=1),
+    'deal_id': fields.Integer(required=True, example=1, description='deals id'),
     'is_deleted': fields.Boolean(required=True, example=False)
 })
 
@@ -141,11 +141,11 @@ user_category_preferences = api.model("USER_CATEGORY_PREFERENCES",{
 })
 
 user_vendor_preference = api.model("USER_VENDOR_PREFERENCES", {
-    'user_vendor_preference': fields.List(fields.Nested(user_ven, skip_none=True))
+    'user_vendor_preferences': fields.List(fields.Nested(user_ven, skip_none=True))
 })
 
 user_deal_preference = api.model("USER_DEAL_PREFERENCES", {
-    'user_deal_preference': fields.List(fields.Nested(user_deal, skip_none=True))
+    'user_deal_preferences': fields.List(fields.Nested(user_deal, skip_none=True))
 })
 
 # error handlers for jwt

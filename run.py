@@ -19,6 +19,7 @@ ns_deals.add_resource(CreateDeals, '/')
 ns_deals.add_resource(UpdateDeals, '/<int:id>')
 ns_deals.add_resource(GetDealsinDate, '/deals_ahead/<int:days_ahead>')
 ns_deals.add_resource(CreateDealTags, '/deal_tags')
+ns_user_cat_map.add_resource(UserCatMapAPI, '/categories')
 
 if __name__ == '__main__':
     app.run(debug=True)

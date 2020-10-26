@@ -115,3 +115,76 @@ class UpdateUsers(Resource):
             return {'message': 'Authorization header missing'}, 401
 
 
+class UserCatMapAPI(Resource):
+
+    @jwt_required
+    @ns_user_cat_map.expect(user_category_preferences)
+    def post(self):
+        """
+        create User Category Preference
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            body = request.get_json()
+            if not body:
+                raise SchemaValidationError
+            ucps = body['user_category_preferences']
+            for ucp in ucps:
+                if ucp['is_deleted'] == True:
+                    ggs = UserCategoryPreference.query.filter_by(user_id=user_id, category_id=ucp['category_id']).first()
+                    if not ggs:
+                        continue
+                    ggs.is_deleted = True
+                    ggs.deleted_date = datetime.now()
+                    db.session.commit()
+                else:
+                    if UserCategoryPreference.query.filter_by(user_id=user_id, category_id=ucp['category_id']).first():
+                        continue
+                    ggs = UserCategoryPreference(user_id=user_id, category_id=ucp['category_id'])
+                    ggs.created_date = datetime.now()
+                    db.session.add(ggs)
+                    db.session.commit()
+            return {'message': 'Success'}, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+        except SchemaValidationError:
+            raise BadRequest(errors['SchemaValidationError']['message'], response=404)
+    
+    @jwt_required
+    @ns_user_cat_map.expect(pagination, validate=True)
+    def get(self):
+        """
+        Get all user category preferences
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            args = pagination.parse_args()
+            page = args.get('page', 1)
+            per_page = args.get('per_page', 10)
+            ucps = UserCategoryPreference.query.filter_by(user_id=user_id).paginate(page=page, per_page=per_page, error_out=False)
+            if not ucps:
+                return {'message': 'User Category Preferences not found'}, 404
+            output = []
+            for ucp in ucps.items:
+                output.append({
+                    'id': ucp.id,
+                    'user_id': ucp.user_id,
+                    'category_id': ucp.category_id,
+                    'created_date': str(ucp.created_date),
+                    'updated_date': str(ucp.updated_date),
+                    'is_deleted': ucp.is_deleted,
+                    'deleted_date': str(ucp.deleted_date)
+                })
+            if output == []:
+                return {'message': 'User Category Preferences not found in page {}'.format(page)}, 404
+            return {'user_category_preferences': output}, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+        except InternalServerError as e:
+            return {'message': str(e)}, 400
