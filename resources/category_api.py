@@ -3,6 +3,7 @@ from database.models import *
 class CatagoriesCreate(Resource):
 
     @jwt_required
+    @ns_category.expect(pagination, validate=True)
     def get(self):
         '''
         get all the categories
@@ -12,7 +13,10 @@ class CatagoriesCreate(Resource):
             user = User.query.get(user_id)
             if not user:
                 raise UserNotExistsError
-            return Category.get_all_categories_to_json()
+            args = pagination.parse_args()
+            page = args.get('page',1)
+            per_page = args.get('per_page', 10)
+            return Category.get_paginated_categories(page=page, per_page=per_page)
         except InternalServerError as e:
             raise BadRequest(errors['InternalServerError']['message'])
         except UserNotExistsError:

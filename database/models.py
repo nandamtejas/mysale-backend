@@ -154,6 +154,32 @@ class Category(db.Model):
                 }
         except InternalServerError as e:
             raise BadRequest(e, response=400)
+    
+    @staticmethod
+    def get_paginated_categories(page, per_page):
+        try:
+            categories = Category.query.paginate(page=page, per_page=per_page, error_out=False)
+            if not categories:
+                return {'message': "Categories not found"}, 404
+            output = []
+            for category in categories.items:
+                output.append({
+                    'id': category.id,
+                    'name': category.name,
+                    'image_url': category.image_url,
+                    'description': category.description,
+                    'order': category.order,
+                    'added_by': category.added_by,
+                    'created_date': str(category.created_date),
+                    'updated_date': str(category.updated_date),
+                    'is_deleted': category.is_deleted,
+                    'deleted_date': str(category.deleted_date)
+                })
+            if output == []:
+                return {'message': "Categories not found in page {}".format(page)}
+            return {'categories': output}, 200
+        except InternalServerError as e:
+            return {'message': str(e)}, 400
 
 class Vendor(db.Model):
     __tablename__ = 'vendor_table'
@@ -215,6 +241,32 @@ class Vendor(db.Model):
                 }, 200
         except InternalServerError as e:
             return {'message': str(e)}, 400
+    
+    @staticmethod
+    def get_paginated_vendors(page, per_page):
+        try:
+            vendors = Vendor.query.paginate(page=page, per_page=per_page, error_out=False)
+            if not vendors:
+                return {'message', 'Vendors not found'}, 404
+            output = []
+            for vendor in vendors.items:
+                output.append({
+                    'id': vendor.id,
+                    'name': vendor.name,
+                    'image_url': vendor.image_url,
+                    'description': vendor.description,
+                    'order': vendor.order,
+                    'added_by': vendor.added_by,
+                    'created_date': str(vendor.created_date),
+                    'updated_date': str(vendor.updated_date),
+                    'is_deleted': vendor.is_deleted,
+                    'deleted_date': str(vendor.deleted_date)
+                })
+            if output == []:
+                return {'message': "Vendors not found in page {}".format(page)}, 404
+            return {'vendors': output}, 200
+        except InternalServerError as e:
+            return {'message': str(e)}, 400
 
 
 class VendorCategoryMapping(db.Model):
@@ -235,6 +287,7 @@ class Deals(db.Model):
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendor_table.id'))
     start_date = db.Column(db.DateTime)
     end_date = db.Column(db.DateTime)
+    is_available = db.Column(db.Boolean, default=False)
     added_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_date = db.Column(db.DateTime, default=datetime.now())
     updated_date = db.Column(db.DateTime)
@@ -285,6 +338,33 @@ class Deals(db.Model):
                 'is_deleted': str(deal.is_deleted),
                 'deleted_date': str(deal.deleted_date)
             }, 200
+        except InternalServerError as e:
+            return {'message': str(e)}, 400
+    
+    @staticmethod
+    def get_paginated_deals(page, per_page):
+        try:
+            deals = Deals.query.paginate(page=page, per_page=per_page, error_out=False)
+            if not deals:
+                return {'message': 'Deals not found!!'}, 404
+            output = []
+            for deal in deals.items:
+                output.append({
+                    'id': deal.id,
+                    'name': deal.name,
+                    'image_url': deal.image_url,
+                    'vendor_id': deal.vendor_id,
+                    'start_date': str(deal.start_date),
+                    'end_date': str(deal.end_date),
+                    'added_by': deal.added_by,
+                    'created_date': str(deal.created_date),
+                    'updated_date': str(deal.updated_date),
+                    'is_deleted': str(deal.is_deleted),
+                    'deleted_date': str(deal.deleted_date)
+                })
+            if output == []:
+                return {'message': "Deals not found in page {}".format(page)}, 404
+            return {'deals': output}, 200
         except InternalServerError as e:
             return {'message': str(e)}, 400
 

@@ -38,6 +38,7 @@ class CreateDeals(Resource):
             handle_error_internal_server(errors)
 
     @jwt_required
+    @ns_deals.expect(pagination, validate=True)
     def get(self):
         """
         retrieve all deals
@@ -47,7 +48,10 @@ class CreateDeals(Resource):
             user = User.query.get(user_id)
             if not user:
                 raise UserNotExistsError
-            return Deals.get_all_deals_to_json()
+            args = pagination.parse_args()
+            page = args.get('page',1)
+            per_page = args.get('per_page', 10)
+            return Deals.get_paginated_deals(page=page, per_page=per_page)
         except UserNotExistsError:
             raise BadRequest(f"User with id {user_id} not exists", response=404)
 

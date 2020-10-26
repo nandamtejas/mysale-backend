@@ -3,6 +3,7 @@ from database.models import *
 class VendorCreate(Resource):
 
     @jwt_required
+    @ns_vendor.expect(pagination, validate=True)
     def get(self):
         """
         get all vendors
@@ -12,7 +13,10 @@ class VendorCreate(Resource):
             user = User.query.get(user_id)
             if not user:
                 raise UserNotExistsError
-            return Vendor.get_all_vendors_to_json()
+            args = pagination.parse_args()
+            page = args.get('page',1)
+            per_page = args.get('per_page', 10)
+            return Vendor.get_paginated_vendors(page=page, per_page=per_page)
         except UserNotExistsError:
             raise BadRequest('User with id {} not found'.format(user_id),response=404)
         except InternalServerError as e:
