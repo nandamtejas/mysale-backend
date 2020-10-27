@@ -49,10 +49,12 @@ bcrypt = Bcrypt(app=app)
 jwt = JWTManager(app=app)
 db = SQLAlchemy(app=app)
 
+choices = list(range(1,25))
+
 # parsing the parameters
 pagination = RequestParser(bundle_errors=True)
 pagination.add_argument("page", type=positive, required=False, default=1)
-pagination.add_argument("per_page", type=positive, required=False, choices=[5,10,15,20,25,30,35,40,45,50], default=10)
+pagination.add_argument("per_page", type=positive, required=False, choices=choices, default=10)
 
 
 #namespace
