@@ -213,3 +213,7 @@ def handle_failed_user_claims_verification(e):
 @api.errorhandler(TypeError)
 def handle_type_error(e):
     return {'message': str(e)}, 400
+
+@api.errorhandler(500)
+def handle_500_error(e):
+    return {'message': str(e)}
