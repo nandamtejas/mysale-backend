@@ -207,3 +207,7 @@ def handler_user_load_error(e):
 @api.errorhandler(UserClaimsVerificationError)
 def handle_failed_user_claims_verification(e):
     return {'message': 'User claims verification failed'}, 401
+
+@api.errorhandler(TypeError)
+def handle_type_error(e):
+    return {'message': str(e)}, 400

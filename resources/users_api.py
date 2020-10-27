@@ -188,3 +188,74 @@ class UserCatMapAPI(Resource):
             raise BadRequest(f"User with id {user_id} not exists", response=404)
         except InternalServerError as e:
             return {'message': str(e)}, 400
+
+class UserVenMapAPI(Resource):
+
+    @jwt_required
+    @ns_user_vend_map.expect(user_vendor_preference)
+    def post(self):
+        """
+        create user vendor preferences
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            body = request.get_json()
+            if not body or body is None:
+                raise SchemaValidationError
+            uvps = body['user_vendor_preferences']
+            for uvp in uvps:
+                if uvp['is_deleted']:
+                    ggs = UserVendorPreference.query.filter_by(user_id=user_id, vendor_id=uvp['vendor_id']).first()
+                    if not ggs:
+                        continue
+                    ggs.is_deleted = True
+                    ggs.deleted_date = datetime.now()
+                    db.session.commit()
+                else:
+                    if UserVendorPreference.query.filter_by(user_id=user_id, vendor_id=uvp['vendor_id']).first():
+                        continue
+                    ggs = UserVendorPreference(user_id=user_id, vendor_id=uvp['vendor_id'])
+                    db.session.add(ggs)
+                    db.session.commit()
+            return {'message': "Success"}, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+        except SchemaValidationError:
+            raise BadRequest(errors['SchemaValidationError']['message'], response=404)
+
+    @jwt_required
+    @ns_user_vend_map.expect(pagination, validate=True)
+    def get(self):
+        """
+        get the user vendor preferences
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            args = pagination.parse_args()
+            page = args.get('page', 1)
+            per_page = args.get('per_page', 10)
+            uvps = UserVendorPreference.query.filter_by(user_id=user_id).paginate(page=page, per_page=per_page, error_out=False)
+            output = []
+            for uvp in uvps.items:
+                output.append({
+                    'id': uvp.id,
+                    'user_id': uvp.user_id,
+                    'vendor_id': uvp.vendor_id,
+                    'created_date': str(uvp.created_date),
+                    'updated_date': str(uvp.updated_date),
+                    'is_deleted': uvp.is_deleted,
+                    'deleted_date': str(uvp.deleted_date)
+                })
+            if output == []:
+                return {'message': "User vendor preferences not found in page {}". format(page)}, 404
+            return {'user_vendor_preferences': output}, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+        except InternalServerError as e:
+            return {'message': str(e)}, 400
