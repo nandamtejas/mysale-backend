@@ -125,17 +125,17 @@ deal_tags = api.model("DEAL_TAGS", {
 
 user_cat = api.model("USER_CATEGORY", {
     'category_id': fields.Integer(required=True, example=1, description='category id'),
-    'is_deleted': fields.Boolean(required=True, example=False)
+    'is_deleted': fields.Boolean(required=True, example=False, default=False)
 })
 
 user_ven = api.model("USER_VENDOR", {
     'vendor_id': fields.Integer(required=True, example=1, description='vendor id'),
-    'is_deleted': fields.Boolean(required=True, example=False)
+    'is_deleted': fields.Boolean(required=True, example=False, default=False)
 })
 
 user_deal = api.model("USER_DEAL", {
     'deal_id': fields.Integer(required=True, example=1, description='deals id'),
-    'is_deleted': fields.Boolean(required=True, example=False)
+    'is_deleted': fields.Boolean(required=True, example=False, default=False)
 })
 
 user_category_preferences = api.model("USER_CATEGORY_PREFERENCES",{
@@ -214,6 +214,6 @@ def handle_failed_user_claims_verification(e):
 def handle_type_error(e):
     return {'message': str(e)}, 400
 
-@api.errorhandler(500)
+@app.errorhandler(500)
 def handle_500_error(e):
     return {'message': str(e)}

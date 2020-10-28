@@ -259,3 +259,76 @@ class UserVenMapAPI(Resource):
             raise BadRequest(f"User with id {user_id} not exists", response=404)
         except InternalServerError as e:
             return {'message': str(e)}, 400
+
+class UserDealMap(Resource):
+
+    @jwt_required
+    @ns_user_deals_map.expect(user_deal_preference)
+    def post(self):
+        """
+        create user deal preferences
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            body = request.get_json()
+            if body is None:
+                raise UserNotExistsError
+            udps = body['user_deal_preferences']
+            for udp in udps:
+                if udp['is_deleted'] == True:
+                    ggs = UserDealPreference.query.filter_by(user_id=user_id, deal_id=udp['deal_id']).first()
+                    if not ggs:
+                        continue
+                    ggs.is_deleted = True
+                    ggs.action = 'remove'
+                    ggs.deleted_date = datetime.now()
+                    db.session.commit()
+                else:
+                    if UserDealPreference.query.filter_by(user_id=user_id, deal_id=udp['deal_id']).first():
+                        continue
+                    ggs = UserDealPreference(user_id=user_id, deal_id=udp['deal_id'], action='save')
+                    ggs.created_date = datetime.now()
+                    db.session.add(ggs)
+                    db.session.commit()
+            return {'message': 'Success'}, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+        except SchemaValidationError:
+            raise BadRequest(errors['SchemaValidationError']['message'], response=404)
+
+    
+    @jwt_required
+    @ns_user_deals_map.expect(pagination, validate=True)
+    def get(self):
+        """
+        get user deal preference
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            args = pagination.parse_args()
+            page = args.get('page', 1)
+            per_page = args.get('per_page', 10)
+            udps = UserDealPreference.query.filter_by(user_id=user_id).paginate(page=page, per_page=per_page)
+            output = []
+            for udp in udps.items:
+                output.append({
+                    'id': udp.id,
+                    'user_id': udp.user_id,
+                    'deal_id': udp.deal_id,
+                    'action': udp.action,
+                    'created_date': str(udp.created_date),
+                    'updated_date': str(udp.updated_date),
+                    'is_deleted': udp.is_deleted,
+                    'deleted_date': str(udp.deleted_date)
+                })
+            if output == []:
+                return {'message': "User deal preferences not found in page {}".format(page)}, 404
+            return {'user_deal_preferences': output}, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)

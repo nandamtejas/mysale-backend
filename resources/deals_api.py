@@ -134,6 +134,7 @@ class UpdateDeals(Resource):
 class GetDealsinDate(Resource):
 
     @jwt_required
+    @ns_deals.expect(pagination, validate=True)
     def get(self, days_ahead=7):
         """
         retrieve deals for 7 days before from start date of deal
@@ -144,14 +145,18 @@ class GetDealsinDate(Resource):
             user = User.query.get(user_id)
             if not user:
                 raise UserNotExistsError
-            deals = Deals.query.order_by(Deals.id).all()
+            args = pagination.parse_args()
+            page = args.get('page', 1)
+            per_page = args.get('per_page', 10)
+            deals = Deals.query.order_by(Deals.id).paginate(page=page, per_page=per_page, error_out=False)
             if not deals:
                 return {'message': "Deals not found!!"}, 404
-            output = []
-            for deal in deals:
+            output1 = []
+            # check upcomming deals within days_ahead
+            for deal in deals.items:
                 rem_days = deal.start_date - datetime.now()
                 if 0 <= rem_days.days <= int(days_ahead):
-                    output.append({
+                    output1.append({
                     'id': deal.id,
                     'name': deal.name,
                     'image_url': deal.image_url,
@@ -164,6 +169,26 @@ class GetDealsinDate(Resource):
                     'is_deleted': str(deal.is_deleted),
                     'deleted_date': str(deal.deleted_date)
                     })
+            # if deals not found within days ahead the retrieve all upcomming deals within start date
+            if output1 == []:
+                for deal in deals.items:
+                    if datetime.now() <= deal.start_date:
+                        output1.append({
+                        'id': deal.id,
+                        'name': deal.name,
+                        'image_url': deal.image_url,
+                        'vendor_id': deal.vendor_id,
+                        'start_date': str(deal.start_date),
+                        'end_date': str(deal.end_date),
+                        'added_by': deal.added_by,
+                        'created_date': str(deal.created_date),
+                        'updated_date': str(deal.updated_date),
+                        'is_deleted': str(deal.is_deleted),
+                        'deleted_date': str(deal.deleted_date)
+                        })
+            output = output1
+            if output == []:
+                return {'message': "deals not found in page {}".format(page)}, 404
             return {'upcomming_deals': output}, 200
         except UserNotExistsError:
             raise BadRequest(f"User with id {user_id} not exists", response=404)

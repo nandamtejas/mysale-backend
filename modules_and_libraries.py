@@ -19,4 +19,4 @@ try:
     from flask_mail import Mail
     from errors import *
 except Exception as e:
-    return {'message': str(e)}, 400
+    print(str(e))
