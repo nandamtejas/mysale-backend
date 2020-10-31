@@ -58,19 +58,6 @@ pagination.add_argument("page", type=positive, required=False, default=1)
 pagination.add_argument("per_page", type=positive, required=False, choices=choices, default=10)
 
 
-# admin decorator
-def admin_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        verify_jwt_in_request()
-        claims = get_jwt_claims()
-        print(claims)
-    return decorated
-
-# vendor decorator
-
-
-
 #namespace
 ns_auth = api.namespace('auth', description='authorization')
 ns_users = api.namespace('users', description='users')
@@ -246,3 +233,4 @@ def handle_500_error(e):
 @app.errorhandler(NameError)
 def handle_name_error(e):
     return {'message': str(e)}, 400
+
