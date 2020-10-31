@@ -4,6 +4,7 @@ from resources.users_api import *
 from resources.category_api import *
 from resources.vendor_api import *
 from resources.deals_api import *
+from resources.vendor_category_mapping import *
 
 ns_auth.add_resource(SignUp, '/register')
 ns_auth.add_resource(LogIn, '/login')
@@ -28,6 +29,8 @@ ns_user_deals_map.add_resource(UserDealMap, '/deals')
 ns_user_deals_map.add_resource(UpdateUserDealPreference, '/deal/<int:id>')
 ns_deal_tag_map.add_resource(MappingDealsAndTags, '/')
 ns_deal_tag_map.add_resource(UpdateDealTagMapping, '/<int:id>')
+ns_ven_cat_map.add_resource(VendorCategoryMappingAPI, '/')
+ns_ven_cat_map.add_resource(UpdateVendorCategoryMappingAPI, '<int:id>')
 
 if __name__ == '__main__':
     app.run(debug=True)

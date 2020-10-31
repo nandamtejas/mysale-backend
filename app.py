@@ -70,6 +70,7 @@ ns_user_deals_map = api.namespace('user_deals', description='User-Deals')
 ns_deal_tag_map = api.namespace('deal-tags', description='Deal-Tags Mapping')
 ns_ven_cat_map = api.namespace('vendor-category', description="Vendor-Category Mapping")
 
+
 # fields
 register = api.model('REGISTER', {
     'first_name': fields.String(required=True, example='first_name'),
@@ -156,11 +157,20 @@ user_deal_preference = api.model("USER_DEAL_PREFERENCES", {
 
 deal_tag_map = api.model("DEAL_TAGS", {
     'deal_id': fields.Integer(required=True, example=1),
-    'tag_id': fields.Integer(required=True)
+    'tag_id': fields.Integer(required=True, example=1)
 })
 
 deal_tag_mapping = api.model("DEAL_TAGS_MAPPING", {
     'deal_tag_mapping': fields.List(fields.Nested(deal_tag_map, skip_none=True))
+})
+
+ven_cat = api.model('VENDOR_CATEGORY', {
+    'vendor_id': fields.Integer(required=True, example=1),
+    'category_id': fields.Integer(required=True, example=1)
+})
+
+vendor_category_mapping = api.model('VENDOR_CATEGORY_MAPPING', {
+    'vendor_category_mapping': fields.List(fields.Nested(ven_cat, skip_none=True))
 })
 
 # error handlers for jwt
@@ -243,3 +253,6 @@ def handle_syntax_error(e):
 def handle_attribute_error(e):
     return {'message': str(e)}, 400
 
+@api.errorhandler(IndentationError)
+def handle_indentation_error(e):
+    return {'message': str(e)}, 400
