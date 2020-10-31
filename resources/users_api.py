@@ -188,7 +188,82 @@ class UserCatMapAPI(Resource):
             raise BadRequest(f"User with id {user_id} not exists", response=404)
         except InternalServerError as e:
             return {'message': str(e)}, 400
-            
+
+class UpdateUserCatMap(Resource):
+
+    @jwt_required
+    def delete(self, id):
+        """
+        delete user category preferences
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            ucp = UserCategoryPreference.query.filter_by(id=id, user_id=user_id).first()
+            if not ucp:
+                return {'message': "user category preference not found"}, 404
+            db.session.delete(ucp)
+            db.session.commit()
+            return {'message': "Success"}, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists",response=404)
+    
+    @jwt_required
+    def get(self, id):
+        """
+        get user category preference
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            ucp = UserCategoryPreference.query.filter_by(id=id, user_id=user_id).first()
+            if not ucp:
+                return {'message': "user category preferences not found"}, 404
+            return {
+                'id': ucp.id,
+                'user_id': ucp.user_id,
+                'category_id': ucp.category_id,
+                'created_date': str(ucp.created_date),
+                'updated_date': str(ucp.updated_date),
+                'is_deleted': ucp.is_deleted,
+                'deleted_date': str(ucp.deleted_date)
+            }, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+    
+    @jwt_required
+    @ns_user_cat_map.expect(user_cat)
+    def put(self, id):
+        """
+        update uder category preference
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            ucp = UserCategoryPreference.query.filter_by(id=id, user_id=user_id).first()
+            if not ucp:
+                return {'message': "user category preferences not found"}, 404
+            body = request.get_json()
+            if not body or body is None:
+                raise SchemaValidationError
+            ucp.category_id = body['category_id']
+            ucp.is_deleted = body['is_deleted']
+            if body['is_deleted'] == True:
+                ucp.deleted_date = datetime.now()
+            ucp.updated_date = datetime.now()
+            db.session.commit()
+            return {'message': "Success"}, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+        except SchemaValidationError:
+            raise BadRequest(errors['SchemaValidationError']['message'], response=404)
+
 
 class UserVenMapAPI(Resource):
 
@@ -261,6 +336,83 @@ class UserVenMapAPI(Resource):
         except InternalServerError as e:
             return {'message': str(e)}, 400
 
+class UpdateUserVenMap(Resource):
+
+    @jwt_required
+    def delete(self, id):
+        """
+        delete user vendor preference
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            uvp = UserVendorPreference.query.filter_by(id=id, user_id=user_id).first()
+            if not uvp:
+                return {'message': 'user vandor preference not found'},404
+            db.session.delete(db)
+            db.session.commit()
+            return {'message': "Success"}, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+    
+    @jwt_required
+    def get(self, id):
+        """
+        get user vendor preference
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            uvp = UserVendorPreference.query.filter_by(id=id, user_id=user_id).first()
+            if not uvp:
+                return {'message': " user vendor preference not found"}, 404
+            return {
+                'id': uvp.id,
+                'user_id': uvp.user_id,
+                'vendor_id': uvp.vendor_id,
+                'action': uvp.action,
+                'created_date': str(uvp.created_date),
+                'updated_date': str(uvp.updated_date),
+                'is_deleted': uvp.is_deleted,
+                'deleted_date': str(uvp.deleted_date)
+            }, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+    
+    @jwt_required
+    @ns_user_vend_map.expect(user_ven)
+    def put(self, id):
+        """
+        update user vendor preference
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            uvp = UserVendorPreference.query.filter_by(id=id, user_id=user_id).first()
+            if not uvp:
+                return {'message': "user vendor preference not found"}, 404
+            body = request.get_json()
+            if not body or body is None:
+                raise SchemaValidationError
+            uvp.vendor_id = body['vendor_id']
+            uvp.is_deleted = body['is_deleted']
+            uvp.action = body['action']
+            if body['is_deleted'] == True:
+                uvp.deleted_date = datetime.now()
+            uvp.updated_date = datetime.now()
+            db.session.commit()
+            return {'message': "Success"}, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+        except SchemaValidationError:
+            raise BadRequest(errors['SchemaValidationError']['message'], response=400)
+
 class UserDealMap(Resource):
 
     @jwt_required
@@ -331,5 +483,78 @@ class UserDealMap(Resource):
             if output == []:
                 return {'message': "User deal preferences not found in page {}".format(page)}, 404
             return {'user_deal_preferences': output}, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+
+class UpdateUserDealPreference(Resource):
+
+    @jwt_required
+    def delete(self, id):
+        """
+        delete user deal preference
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            udp = UserDealPreference.query.filter_by(id=id, user_id=user_id).first()
+            if not udp:
+                return {'message': "user deal preference not found"},404
+            db.session.delete(udp)
+            db.session.commit()
+            return {'message': "Success"}, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+    
+    @jwt_required
+    def get(self, id):
+        """
+        get user deal preference
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            udp = UserDealPreference.query.filter_by(id=id, user_id=user_id).first()
+            if not udp:
+                return {'message': "user_deal preference not found"},404
+            return {
+                'id': udp.id, 
+                'user_id': udp.user_id,
+                'deal_id': udp.deal_id,
+                'created_date': str(udp.created_date),
+                'updated_date': str(udp.updated_date),
+                'is_deleted': udp.is_deleted,
+                'deleted_date': udp.deleted_date
+            }, 200
+        except UserNotExistsError:
+            raise BadRequest(f"User with id {user_id} not exists", response=404)
+    
+    @jwt_required
+    @ns_user_deals_map.expect(user_deal)
+    def put(self, id):
+        """
+        update user deal preference
+        """
+        try:
+            user_id = get_jwt_identity()
+            user = User.query.get(user_id)
+            if not user:
+                raise UserNotExistsError
+            udp = UserDealPreference.query.filter_by(id=id, user_id=user_id).first()
+            if not udp:
+                return {'message': "user deal preference not found"}, 404
+            body = request.get_json()
+            if not body or body is None:
+                raise SchemaValidationError
+            udp.deal_id = body['deal_id']
+            udp.is_deleted = body['is_deleted']
+            if body['is_deleted'] == True:
+                udp.deleted_date = datetime.now()
+            udp.updated_date = datetime.now()
+            db.session.commit()
+            return {'message': "Success"}, 200
         except UserNotExistsError:
             raise BadRequest(f"User with id {user_id} not exists", response=404)

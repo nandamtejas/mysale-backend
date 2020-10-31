@@ -138,6 +138,7 @@ user_ven = api.model("USER_VENDOR", {
 
 user_deal = api.model("USER_DEAL", {
     'deal_id': fields.Integer(required=True, example=1, description='deals id'),
+    'action': fields.String(required=True, example='save/remove'),
     'is_deleted': fields.Boolean(required=True, example=False, default=False)
 })
 
@@ -230,7 +231,15 @@ def handle_type_error(e):
 def handle_500_error(e):
     return {'message': str(e)}
 
-@app.errorhandler(NameError)
+@api.errorhandler(NameError)
 def handle_name_error(e):
+    return {'message': str(e)}, 400
+
+@api.errorhandler(SyntaxError)
+def handle_syntax_error(e):
+    return {'message': str(e)}, 400
+
+@api.errorhandler(AttributeError)
+def handle_attribute_error(e):
     return {'message': str(e)}, 400
 
