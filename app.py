@@ -43,6 +43,7 @@ app.config['MAIL_PASSWORD'] = config.MAIL_PASSWORD
 app.config['MAIL_USE_TLS'] = config.MAIL_USE_TLS
 app.config['MAIL_USE_SSL'] = config.MAIL_USE_SSL
 app.config['MAIL_DEFAULT_SENDER'] = config.MAIL_DEFAULT_SENDER
+app.config['PROPAGATE_EXCEPTIONS'] = True
 mail = Mail(app)
 
 bcrypt = Bcrypt(app=app)
@@ -57,15 +58,30 @@ pagination.add_argument("page", type=positive, required=False, default=1)
 pagination.add_argument("per_page", type=positive, required=False, choices=choices, default=10)
 
 
+# admin decorator
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        verify_jwt_in_request()
+        claims = get_jwt_claims()
+        print(claims)
+    return decorated
+
+# vendor decorator
+
+
+
 #namespace
 ns_auth = api.namespace('auth', description='authorization')
 ns_users = api.namespace('users', description='users')
 ns_category = api.namespace('category', description='Categories')
 ns_vendor = api.namespace('vendor', description='Vendors')
 ns_deals = api.namespace('deals', description='deals')
-ns_user_cat_map = api.namespace('user_categories', description='User_Categories')
+ns_user_cat_map = api.namespace('user_categories', description='User-Categories')
 ns_user_vend_map = api.namespace('user_vendors', description='User-Vendors')
 ns_user_deals_map = api.namespace('user_deals', description='User-Deals')
+ns_deal_tag_map = api.namespace('deal-tags', description='Deal-Tags Mapping')
+ns_ven_cat_map = api.namespace('vendor-category', description="Vendor-Category Mapping")
 
 # fields
 register = api.model('REGISTER', {
@@ -150,6 +166,15 @@ user_deal_preference = api.model("USER_DEAL_PREFERENCES", {
     'user_deal_preferences': fields.List(fields.Nested(user_deal, skip_none=True))
 })
 
+deal_tag_map = api.model("DEAL_TAGS", {
+    'deal_id': fields.Integer(required=True, example=1),
+    'tag_id': fields.Integer(required=True)
+})
+
+deal_tag_mapping = api.model("DEAL_TAGS_MAPPING", {
+    'deal_tag_mapping': fields.List(fields.Nested(deal_tag_map, skip_none=True))
+})
+
 # error handlers for jwt
 
 @api.errorhandler(NoAuthorizationError)
@@ -217,3 +242,7 @@ def handle_type_error(e):
 @app.errorhandler(500)
 def handle_500_error(e):
     return {'message': str(e)}
+
+@app.errorhandler(NameError)
+def handle_name_error(e):
+    return {'message': str(e)}, 400

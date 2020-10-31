@@ -188,6 +188,7 @@ class UserCatMapAPI(Resource):
             raise BadRequest(f"User with id {user_id} not exists", response=404)
         except InternalServerError as e:
             return {'message': str(e)}, 400
+            
 
 class UserVenMapAPI(Resource):
 
