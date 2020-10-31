@@ -241,7 +241,7 @@ class CreateDealTags(Resource):
             args = pagination.parse_args()
             page = args.get('page', 1)
             per_page = args.get('per_page', 10)
-            deal_tags = DealTag.query.order_by(DealTag.id).paginate(page=page, per_page=per_page)
+            deal_tags = DealTag.query.order_by(DealTag.id).paginate(page=page, per_page=per_page, error_out=False)
             if not deal_tags:
                 return {'message': 'Deal tags not found!!'}, 404
             output = []
@@ -396,7 +396,7 @@ class MappingDealsAndTags(Resource):
             args = pagination.parse_args()
             page = args.get('page', 1)
             per_page = args.get('per_page',10)
-            dtms = DealTagMapping.query.paginate(page=page, per_page=per_page)
+            dtms = DealTagMapping.query.paginate(page=page, per_page=per_page, error_out=False)
             output = []
             for dtm in dtms.items:
                 output.append({
