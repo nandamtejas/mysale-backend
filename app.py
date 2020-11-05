@@ -181,7 +181,7 @@ def handle_auth_error(e):
 
 
 @api.errorhandler(CSRFError)
-def handle_auth_error(e):
+def handle_csrf_error(e):
     return {'message': str(e)}, 401
 
 
