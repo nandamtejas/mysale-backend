@@ -3,6 +3,7 @@ from message_services.send_email import email
 
 class SignUp(Resource):
     @ns_auth.expect(register)
+    #@ns_auth.expect(ppsuser,validate=True)
     def post(self):
         """
         Register User
@@ -10,7 +11,8 @@ class SignUp(Resource):
         try:
             body = request.get_json()
             if body is None:
-                raise BadRequest('No data is requested', response=404)
+                raise BadRequest('No data is requested')
+            #args = ppsuser.parse_args()
             user = User.query.filter_by(email=body['email']).all()
             email = body['email']
             if user:
@@ -23,7 +25,7 @@ class SignUp(Resource):
             db.session.commit()
             return {'message': 'success'}, 200
         except InternalServerError as e:
-            raise BadRequest(e, response=400)
+            raise BadRequest(str(e), response=400)
 
 class LogIn(Resource):
     
@@ -35,7 +37,7 @@ class LogIn(Resource):
         try:
             body = request.get_json()
             if body is None:
-                raise BadRequest('No data is requested', response=404)
+                raise BadRequest('No data is requested')
             user = User.query.filter_by(email=body['email']).first()
             email = body['email']
             if not user:
@@ -46,7 +48,7 @@ class LogIn(Resource):
             token = create_access_token(identity=str(user.id), expires_delta=timedelta(days=7))
             return {'message': 'success', 'token': token},200
         except InternalServerError as e:
-            raise BadRequest(e)
+            raise BadRequest(str(e))
 
 class ForgotPassword(Resource):
 
@@ -86,7 +88,7 @@ class ResetPassword(Resource):
             password = body['new_password']
             confirm_password = body['confirm_password']
             if password != confirm_password:
-                raise BadRequest("Password didn't match", response=401)
+                raise BadRequest("Password didn't match")
             if token is None:
                 raise BadRequest('Fields not filled')
             user_id = decode_token(token)['identity']

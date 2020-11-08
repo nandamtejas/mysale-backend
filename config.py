@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # SQLALCHEMY SETTINGS
-#SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL'] = 'sqlite:///database.db'
-SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI'] 
+SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL'] = 'sqlite:///database.db'
+#SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI'] 
 SQLALCHEMY_TRACK_MODIFICATIONS=True
 SECRET_KEY=os.environ['SECRET_KEY']
 

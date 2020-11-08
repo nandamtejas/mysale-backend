@@ -1,5 +1,6 @@
 from modules_and_libraries import *
 import os
+from werkzeug.datastructures import FileStorage
 
 
 app = Flask(__name__)
@@ -52,10 +53,18 @@ db = SQLAlchemy(app=app)
 
 choices = list(range(1,25))
 
-# parsing the parameters
+# parsing the parameters for pagination
 pagination = RequestParser(bundle_errors=True)
 pagination.add_argument("page", type=positive, required=False, default=1)
 pagination.add_argument("per_page", type=positive, required=False, choices=choices, default=10)
+
+# parsing the parameters for saving the images
+pps = RequestParser(bundle_errors=True)
+pps.add_argument("image_url", type=FileStorage, location='files')
+
+# for users table you required profile pic url and thumbnail url
+ppsuser = pps.copy()
+ppsuser.add_argument("thumbnail_url", type=FileStorage, location='files')
 
 
 #namespace
